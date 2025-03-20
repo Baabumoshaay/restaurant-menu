@@ -166,14 +166,16 @@ def place_order(item_id):
         return jsonify({"error": "Unauthorized"}), 403
 
     data = request.get_json()
+    print("🛠 Received JSON Payload:", data)  # ✅ Debugging print statement
+
     if not data or "quantity" not in data:
-        return jsonify({"error": "Missing quantity"}), 422  # Ensure quantity is provided
+        return jsonify({"error": "Missing quantity"}), 422  # ✅ Return proper error message
 
     item = MenuItem.query.get(item_id)
     if not item:
         return jsonify({"error": "Item not found"}), 404
 
-    quantity = data.get("quantity", 1)  # Default to 1 if not provided
+    quantity = int(data["quantity"])  # Ensure it's an integer
 
     new_order = Order(
         user_id=User.query.filter_by(username=current_user["username"]).first().id, 
@@ -185,6 +187,7 @@ def place_order(item_id):
     db.session.commit()
 
     return jsonify({"message": f"Order placed for {quantity}x {item.name}"}), 200
+
 
 
 @menu_routes.route('/recommendations', methods=['GET'])

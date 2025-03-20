@@ -185,7 +185,10 @@ function loadMenuForUser() {
 // 🟢 PLACE ORDER (USER ONLY)
 function placeOrder(itemId) {
     const token = localStorage.getItem("token");
-    const quantity = document.getElementById(`quantity-${itemId}`).value || 1;  // Get quantity input
+    const quantityInput = document.getElementById(`quantity-${itemId}`);
+    const quantity = quantityInput ? parseInt(quantityInput.value) : 1;  // Ensure integer value
+
+    console.log("📦 Sending order request with:", { quantity }); // ✅ Log payload for debugging
 
     fetch(`${API_BASE_URL}/menu/order/${itemId}`, {
         method: "POST",
@@ -193,11 +196,15 @@ function placeOrder(itemId) {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({ quantity: parseInt(quantity) })  // Ensure integer value
+        body: JSON.stringify({ quantity })  // ✅ Send JSON payload
     })
     .then(response => response.json())
     .then(data => {
-        alert(data.message);
+        console.log("✅ Response from server:", data);  // ✅ Log response for debugging
+        alert(data.message || "Order placed successfully!");
     })
-    .catch(error => console.error("Error:", error));
+    .catch(error => {
+        console.error("❌ Error placing order:", error);
+        alert("Failed to place order.");
+    });
 }

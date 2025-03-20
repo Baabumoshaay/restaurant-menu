@@ -1,3 +1,5 @@
+const API_BASE_URL = "http://34.232.218.47"; // ✅ Updated to EC2 IP without port 5000
+
 document.addEventListener("DOMContentLoaded", function () {
     if (document.getElementById("loginForm")) {
         document.getElementById("loginForm").addEventListener("submit", authenticateUser);
@@ -24,7 +26,7 @@ function registerUser(event) {
     const password = document.getElementById("regPassword").value;
     const role = document.getElementById("regRole").value;
 
-    fetch("http://127.0.0.1:5000/auth/register", {
+    fetch(`${API_BASE_URL}/auth/register`, { // ✅ Updated URL
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password, role })
@@ -47,7 +49,7 @@ function authenticateUser(event) {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
-    fetch("http://127.0.0.1:5000/auth/login", {
+    fetch(`${API_BASE_URL}/auth/login`, { // ✅ Updated URL
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
@@ -78,7 +80,7 @@ function logout() {
 
 // 🟢 FETCH RECOMMENDED MENU ITEMS (Homepage)
 function loadRecommendedItems() {
-    fetch("http://127.0.0.1:5000/menu/recommendations")
+    fetch(`${API_BASE_URL}/menu/recommendations`) // ✅ Updated URL
     .then(response => response.json())
     .then(data => {
         const recommendationList = document.getElementById("recommended-items");
@@ -103,7 +105,7 @@ function loadRecommendedItems() {
 
 // 🟢 LOAD MENU FOR ADMIN
 function loadMenuForAdmin() {
-    fetch("http://127.0.0.1:5000/menu/items")
+    fetch(`${API_BASE_URL}/menu/items`) // ✅ Updated URL
     .then(response => response.json())
     .then(data => {
         const menuList = document.getElementById("admin-menu-list");
@@ -125,7 +127,7 @@ function addMenuItem(event) {
     const category = document.getElementById("itemCategory").value;
     const token = localStorage.getItem("token");
 
-    fetch("http://127.0.0.1:5000/menu/add", {
+    fetch(`${API_BASE_URL}/menu/add`, { // ✅ Updated URL
         method: "POST",
         headers: { 
             "Content-Type": "application/json",
@@ -149,7 +151,7 @@ function addMenuItem(event) {
 function deleteMenuItem(itemId) {
     const token = localStorage.getItem("token");
 
-    fetch(`http://127.0.0.1:5000/menu/delete/${itemId}`, {
+    fetch(`${API_BASE_URL}/menu/delete/${itemId}`, { // ✅ Updated URL
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }
     })
@@ -163,7 +165,7 @@ function deleteMenuItem(itemId) {
 
 // 🟢 LOAD MENU FOR USERS (TO PLACE ORDERS)
 function loadMenuForUser() {
-    fetch("http://127.0.0.1:5000/menu/items")
+    fetch(`${API_BASE_URL}/menu/items`) // ✅ Updated URL
     .then(response => response.json())
     .then(data => {
         const menuList = document.getElementById("user-menu-list");
@@ -181,7 +183,7 @@ function loadMenuForUser() {
 function placeOrder(itemId) {
     const token = localStorage.getItem("token");
 
-    fetch(`http://127.0.0.1:5000/menu/order/${itemId}`, {
+    fetch(`${API_BASE_URL}/menu/order/${itemId}`, { // ✅ Updated URL
         method: "POST",
         headers: { "Authorization": `Bearer ${token}` }
     })

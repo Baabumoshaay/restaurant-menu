@@ -1,0 +1,33 @@
+name: Deploy Django to EC2
+
+on:
+  push:
+    branches:
+      - main  # Change this if using another branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get Latest Code
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/Taxi-Booking
+            if [ ! -d ".git" ]; then
+              echo "Error: Not inside a Git repository!"
+              exit 1
+            fi
+            git pull origin main
+            source venv/bin/activate  # Activate virtual environment
+            pip install -r requirements.txt  # Install dependencies
+            python manage.py migrate  # Apply database migrations
+            python manage.py collectstatic --noinput  # Collect static files
+            sudo systemctl restart gunicorn  # Restart backend service

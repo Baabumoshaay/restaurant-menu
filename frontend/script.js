@@ -165,15 +165,18 @@ function deleteMenuItem(itemId) {
 
 // 🟢 LOAD MENU FOR USERS (TO PLACE ORDERS)
 function loadMenuForUser() {
-    fetch(`${API_BASE_URL}/menu/items`) // ✅ Updated URL
+    fetch(`${API_BASE_URL}/menu/items`)
     .then(response => response.json())
     .then(data => {
         const menuList = document.getElementById("user-menu-list");
         menuList.innerHTML = "";
         data.forEach(item => {
             let li = document.createElement("li");
-            li.innerHTML = `${item.name} - $${item.price} 
-            <button onclick="placeOrder(${item.id})">Order</button>`;
+            li.innerHTML = `
+                ${item.name} - $${item.price} 
+                <input type="number" id="quantity-${item.id}" value="1" min="1" style="width: 50px;"> 
+                <button onclick="placeOrder(${item.id})">Order</button>
+            `;
             menuList.appendChild(li);
         });
     });
@@ -182,10 +185,15 @@ function loadMenuForUser() {
 // 🟢 PLACE ORDER (USER ONLY)
 function placeOrder(itemId) {
     const token = localStorage.getItem("token");
+    const quantity = document.getElementById(`quantity-${itemId}`).value || 1;  // Get quantity input
 
-    fetch(`${API_BASE_URL}/menu/order/${itemId}`, { // ✅ Updated URL
+    fetch(`${API_BASE_URL}/menu/order/${itemId}`, {
         method: "POST",
-        headers: { "Authorization": `Bearer ${token}` }
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ quantity: parseInt(quantity) })  // Ensure integer value
     })
     .then(response => response.json())
     .then(data => {

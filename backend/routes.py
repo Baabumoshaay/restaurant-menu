@@ -165,18 +165,27 @@ def place_order(item_id):
     if current_user["role"] != "user":
         return jsonify({"error": "Unauthorized"}), 403
 
+    data = request.get_json()
+    if not data or "quantity" not in data:
+        return jsonify({"error": "Missing quantity"}), 422  # Ensure quantity is provided
+
     item = MenuItem.query.get(item_id)
     if not item:
         return jsonify({"error": "Item not found"}), 404
 
-    # Create a new order
-    new_order = Order(user_id=User.query.filter_by(username=current_user["username"]).first().id, 
-                      menu_item_id=item.id, quantity=1)
-    
+    quantity = data.get("quantity", 1)  # Default to 1 if not provided
+
+    new_order = Order(
+        user_id=User.query.filter_by(username=current_user["username"]).first().id, 
+        menu_item_id=item.id, 
+        quantity=quantity
+    )
+
     db.session.add(new_order)
     db.session.commit()
 
-    return jsonify({"message": f"Order placed for {item.name}"}), 200
+    return jsonify({"message": f"Order placed for {quantity}x {item.name}"}), 200
+
 
 @menu_routes.route('/recommendations', methods=['GET'])
 def get_recommendations():

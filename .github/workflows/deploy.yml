@@ -1,4 +1,4 @@
-name: Deploy Django to EC2
+name: Deploy Flask to EC2
 
 on:
   push:
@@ -20,14 +20,27 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ubuntu/Taxi-Booking
+            echo "🔹 Connecting to EC2 Instance..."
+            cd /home/ubuntu/restaurant-menu/
+            
             if [ ! -d ".git" ]; then
-              echo "Error: Not inside a Git repository!"
+              echo "❌ Error: Not inside a Git repository!"
               exit 1
             fi
+
+            echo "🔄 Pulling latest code from GitHub..."
             git pull origin main
-            source venv/bin/activate  # Activate virtual environment
-            pip install -r requirements.txt  # Install dependencies
-            python manage.py migrate  # Apply database migrations
-            python manage.py collectstatic --noinput  # Collect static files
-            sudo systemctl restart gunicorn  # Restart backend service
+
+            echo "🐍 Activating virtual environment..."
+            source venv/bin/activate  
+
+            echo "📦 Installing dependencies..."
+            pip install -r requirements.txt 
+
+            echo "📊 Running database migrations (if any)..."
+            flask db upgrade || echo "⚠️ No migrations found, skipping."
+
+            echo "🔄 Restarting Gunicorn service..."
+            sudo systemctl restart flask  # Restart Flask service
+
+            echo "✅ Deployment Complete!"
